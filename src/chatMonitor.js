@@ -8,7 +8,7 @@ export default class chatMonitor {
   }
 
   onChat (channel, user, message, self) {
-    logMsg(user, message);
+    this.logMsg(user, message);
     message = message.trim();
     let firstWord = message.split(' ', 1)[0];
     if (firstWord.charAt(0) === '!') {
