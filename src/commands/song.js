@@ -47,7 +47,7 @@ export default class Song {
           : moment().diff(moment.unix(songLastfm.date.uts));
 
         let song = '';
-        if (elapsedHypem < 900000)
+        if (elapsedHypem < 300000)
           song = `${songHypem.artist} - ${songHypem.title}`;
         else if (nowScrobbling)
           song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;

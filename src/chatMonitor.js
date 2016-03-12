@@ -55,8 +55,4 @@ export default class chatMonitor {
     this.commands.push(newCommand);
     console.log(`Registered command ${newCommand.alias[0]}`);
   }
-
-  executeCommand (index, user, args) {
-    this.commands[index].func(user, args);
-  }
 }
