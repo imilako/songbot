@@ -9,7 +9,7 @@ export default class Song {
     chatMonitor.registerCommand(this, this.song);
   }
 
-  song (bot, user, args) {
+  song (user, args) {
     let name = user['display-name'] || user.username;
 
     let hypem = {
@@ -54,7 +54,7 @@ export default class Song {
         else if (elapsedLastfm < 900000)
           song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
         else return console.log('No song detected in the last 15 min!');
-        bot.say(song);
+        this.bot.say(song);
       })
   }
 }

@@ -32,7 +32,7 @@ export default class Bot {
     });
 
     this.client.connect();
-    this.lastSpoke = moment();
+    this.lastSpoke = moment().subtract(config.messageTimeout, 's');
     this.client.color(config.color);
   }
 
