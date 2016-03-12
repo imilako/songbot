@@ -55,6 +55,7 @@ export default class Song {
           song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
         else return console.log('No song detected in the last 15 min!');
         this.bot.say(song);
+        console.log(`--> ${song}`);
       })
   }
 }

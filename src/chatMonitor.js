@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export default class chatMonitor {
   constructor (bot) {
     bot.client.on('chat', this.onChat.bind(this));
@@ -6,6 +8,7 @@ export default class chatMonitor {
   }
 
   onChat (channel, user, message, self) {
+    logMsg(user, message);
     message = message.trim();
     let firstWord = message.split(' ', 1)[0];
     if (firstWord.charAt(0) === '!') {
@@ -17,6 +20,12 @@ export default class chatMonitor {
       else
         console.log(`${command} command not found or unauthorized`);
     }
+  }
+
+  logMsg (user, message) {
+    let name = user['display-name'] || user.username;
+    let ts = moment().format('HH:mm');
+    console.log(`${ts} ${name}: ${message}`);
   }
 
   getUserPermission (channel, user) {
