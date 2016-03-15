@@ -17,7 +17,7 @@ export default class Song {
 
     this.bot = bot;
     this.cooldown = 0;
-    this.lastUsed = moment().subtract(90, 's');
+    this.lastUsed = moment().subtract(this.cooldown, 's');
   }
 
   song (user, args, isPhrase) {

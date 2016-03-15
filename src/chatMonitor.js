@@ -14,11 +14,13 @@ export default class chatMonitor {
     // check for command
     let firstWord = msg.split(' ', 1)[0];
     if (firstWord.charAt(0) === '!') {
-      let command = firstWord.substr(1);
-      let index = this.getCommandIndex (this.commands, command);
       let userPermission = this.getUserPermission(channel, user);
-      if (index !== -1 && userPermission >= this.commands[index].permission)
-        this.commands[index](user, msg.substr(firstWord.length+1), false);
+      let command = firstWord.substr(1);
+      let commandIndex = this.getCommandIndex (command);
+      commandIndex.forEach(i => {
+        if (userPermission >= this.commands[i].permission)
+          this.commands[i](user, msg.substr(firstWord.length+1), false);
+      })
     }
     // check for phrase
     let phraseIndex = this.getPhraseIndex(message);
@@ -26,7 +28,7 @@ export default class chatMonitor {
       let userPermission = this.getUserPermission(channel, user);
       phraseIndex.forEach(i => {
         if (userPermission >= this.phrases[i].permission)
-          this.phrases[i](user, msg, true);
+          this.phrases[i](user, message, true);
       })
     }
   }
@@ -52,15 +54,13 @@ export default class chatMonitor {
   }
 
   // command control
-  getCommandIndex (commands, name) {
-    let index = -1;
-    commands.forEach((c, i) => {
-      c.alias.forEach(alias => {
-        if (alias === name)
-          index = i;
+  getCommandIndex (name) {
+    return this.commands
+      .map((command, i) => {
+        if (command.alias.includes(name)) return i;
+        return -1;
       })
-    })
-    return index;
+      .filter(e => e !== -1);
   }
 
   registerCommand (context, command, permission, alias = [command.name]) {
