@@ -11,7 +11,8 @@ export default class Song {
                     'song name pls',
                     'what song is this',
                     'what\'s the song?',
-                    'what song this is' 	];
+                    'what song this is',
+                    'name of this song?'  ];
     chatMonitor.registerCommand(this, this.song, '', alias);
     chatMonitor.registerPhrase(this, this.song, '', phrases);
 
@@ -67,11 +68,13 @@ export default class Song {
         else if (elapsedLastfm < 300000)
           song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
         else
-          return console.log('No song detected in the last 15 min!');
+          return console.log('--> No song detected in the last 5 min!');
 
+        /* only whisper when phrase detected
         let sent = isPhrase
           ? false
-          : this.bot.say(song);
+          : this.bot.say(song); */
+        let sent = this.bot.say(song);
         if (!sent) this.bot.whisper(username, song);
         console.log(`--> ${song}`);
       })
