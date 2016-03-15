@@ -7,9 +7,11 @@ export default class Song {
   constructor (bot, chatMonitor) {
     this.bot = bot;
     chatMonitor.registerCommand(this, this.echo, 'mod', ['echo', 'say']);
+    chatMonitor.registerPhrase(this, this.echo, '', ['echo', 'say'])
   }
 
   echo (user, args) {
     this.bot.say(`${args}`);
+    console.log(`${args}`)
   }
 }

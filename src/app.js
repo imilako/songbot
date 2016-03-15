@@ -2,7 +2,7 @@ import Bot from './bot';
 import chatMonitor from './chatMonitor';
 
 import Song from './commands/song';
-//import Echo from './commands/echo';
+import Echo from './commands/echo';
 
 export default class App {
   constructor () {
@@ -11,7 +11,7 @@ export default class App {
     const chat = new chatMonitor(bot)
 
     const song = new Song(bot, chat);
-    //const echo = new Echo(bot, chat);
+    const echo = new Echo(bot, chat);
   }
 }
 

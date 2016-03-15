@@ -19,15 +19,15 @@ export default class chatMonitor {
       let userPermission = this.getUserPermission(channel, user);
       if (index !== -1 && userPermission >= this.commands[index].permission)
         this.commands[index](user, msg.substr(firstWord.length+1), false);
-      else
-        console.log(`${command} command not found or unauthorized`);
     }
     // check for phrase
-    let phraseIndex = this.getPhraseIndex(msg);
-    if (phraseIndex !== -1) {
+    let phraseIndex = this.getPhraseIndex(message);
+    if (phraseIndex.length) {
       let userPermission = this.getUserPermission(channel, user);
-      if (userPermission >= this.phrases[phraseIndex].permission)
-        this.phrases[phraseIndex](user, msg, true);
+      phraseIndex.forEach(i => {
+        if (userPermission >= this.phrases[i].permission)
+          this.phrases[i](user, msg, true);
+      })
     }
   }
 
@@ -82,11 +82,11 @@ export default class chatMonitor {
   }
 
   getPhraseIndex (message) {
-    let index = -1;
-    this.phrases.forEach((p, i) => {
-        if (p.regex.test(message))
-          index = i;
-    })
-    return index;
+    return this.phrases
+      .map((phrase, i) => {
+        if (phrase.regex.test(message)) return i;
+        return -1;
+      })
+      .filter(e => e !== -1);
   }
 }
