@@ -16,7 +16,7 @@ export default class Song {
     chatMonitor.registerPhrase(this, this.song, '', phrases);
 
     this.bot = bot;
-    this.timeout = 90;
+    this.timeout = 60;
     this.lastUsed = moment().subtract(90, 's');
   }
 
@@ -64,9 +64,11 @@ export default class Song {
           song = `${songHypem.artist} - ${songHypem.title}`;
         else if (nowScrobbling)
           song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
-        else if (elapsedLastfm < 900000)
+        else if (elapsedLastfm < 300000)
           song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
-        else return console.log('No song detected in the last 15 min!');
+        else
+          return console.log('No song detected in the last 15 min!');
+
         let sent = isPhrase
           ? false
           : this.bot.say(song);
