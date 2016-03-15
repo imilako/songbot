@@ -5,7 +5,9 @@
   "main": "src/app.js",
   "private": true,
   "scripts": {
-    "start": "babel-node src/app.js"
+    "start": "babel-node src/app.js",
+    "transpile": "babel src -d lib",
+    "libstart": "node lib/app.js"
   },
   "author": "imilako",
   "license": "MIT",
