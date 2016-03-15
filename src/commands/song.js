@@ -16,7 +16,7 @@ export default class Song {
     chatMonitor.registerPhrase(this, this.song, '', phrases);
 
     this.bot = bot;
-    this.cooldown = 0;
+    this.cooldown = 60;
     this.lastUsed = moment().subtract(this.cooldown, 's');
   }
 
