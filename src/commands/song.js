@@ -1,16 +1,29 @@
-import request from 'request-promise'
-import moment from 'moment'
-import Promise from 'bluebird'
-import creds from '../../creds'
+import request from 'request-promise';
+import moment from 'moment';
+import Promise from 'bluebird';
+import creds from '../../creds';
 
 export default class Song {
   constructor (bot, chatMonitor) {
+    let alias = ['song', 'songname', 'nowplaying'];
+    let phrases = [ 'what song is this',
+                    'song name?',
+                    'song name pls',
+                    'what song is this',
+                    'what\'s the song?',
+                    'what song this is' 	];
+    chatMonitor.registerCommand(this, this.song, '', alias);
+    chatMonitor.registerPhrase(this, this.song, '', phrases);
+
     this.bot = bot;
-    chatMonitor.registerCommand(this, this.song);
+    this.timeout = 90;
+    this.lastUsed = moment().subtract(90, 's');
   }
 
-  song (user, args) {
-    let name = user['display-name'] || user.username;
+  song (user, args, isPhrase) {
+    if (moment().diff(this.lastUsed, 'seconds') < this.timeout) return false;
+    this.lastUsed = moment();
+    let username = user['display-name'] || user.username;
 
     let hypem = {
       uri: `https://api.hypem.com/v2/users/${creds.hypemUser}/history?key=swagger`,
@@ -54,7 +67,10 @@ export default class Song {
         else if (elapsedLastfm < 900000)
           song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
         else return console.log('No song detected in the last 15 min!');
-        this.bot.say(song);
+        let sent = isPhrase
+          ? false
+          : this.bot.say(song);
+        if (!sent) this.bot.whisper(username, song);
         console.log(`--> ${song}`);
       })
   }

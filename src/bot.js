@@ -45,6 +45,7 @@ export default class Bot {
   }
 
   whisper (user, message) {
+    if (config.silent || config.disableWhispers) return false;
     this.client.whisper(user, message);
   }
 }

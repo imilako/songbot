@@ -1,7 +1,7 @@
-import request from 'request-promise'
-import moment from 'moment'
-import Promise from 'bluebird'
-import creds from '../../creds'
+import request from 'request-promise';
+import moment from 'moment';
+import Promise from 'bluebird';
+import creds from '../../creds';
 
 export default class Song {
   constructor (bot, chatMonitor) {

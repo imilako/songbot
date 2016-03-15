@@ -1,0 +1,7 @@
+{
+  "tmiDebug": false
+, "silent": false
+, "disableWhispers": true
+, "messageTimeout": 0
+, "color": "Red"
+}

@@ -1,4 +1,7 @@
 node_modules
 config.json
 creds.json
+creds1.json
+creds2.json
 npm-debug.log
+output.txt
