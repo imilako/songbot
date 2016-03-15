@@ -5,7 +5,7 @@ import creds from '../../creds';
 
 export default class Song {
   constructor (bot, chatMonitor) {
-    let alias = ['song', 'songname', 'nowplaying'];
+    let alias = ['song', 'songname', 'nowplaying', 'currentsong'];
     let phrases = [ 'what song is this',
                     'song name?',
                     'song name pls',
@@ -16,12 +16,12 @@ export default class Song {
     chatMonitor.registerPhrase(this, this.song, '', phrases);
 
     this.bot = bot;
-    this.timeout = 60;
+    this.cooldown = 60;
     this.lastUsed = moment().subtract(90, 's');
   }
 
   song (user, args, isPhrase) {
-    if (moment().diff(this.lastUsed, 'seconds') < this.timeout) return false;
+    if (moment().diff(this.lastUsed, 'seconds') < this.cooldown) return false;
     this.lastUsed = moment();
     let username = user['display-name'] || user.username;
 

@@ -10,24 +10,24 @@ export default class chatMonitor {
 
   onChat (channel, user, message, self) {
     this.logMsg(user, message);
-    message = message.trim();
+    let msg = message.trim().toLowerCase();
     // check for command
-    let firstWord = message.split(' ', 1)[0];
+    let firstWord = msg.split(' ', 1)[0];
     if (firstWord.charAt(0) === '!') {
       let command = firstWord.substr(1);
       let index = this.getCommandIndex (this.commands, command);
       let userPermission = this.getUserPermission(channel, user);
       if (index !== -1 && userPermission >= this.commands[index].permission)
-        this.commands[index](user, message.substr(firstWord.length+1), false);
+        this.commands[index](user, msg.substr(firstWord.length+1), false);
       else
         console.log(`${command} command not found or unauthorized`);
     }
     // check for phrase
-    let phraseIndex = this.getPhraseIndex(message);
+    let phraseIndex = this.getPhraseIndex(msg);
     if (phraseIndex !== -1) {
       let userPermission = this.getUserPermission(channel, user);
       if (userPermission >= this.phrases[phraseIndex].permission)
-        this.phrases[phraseIndex](user, message, true);
+        this.phrases[phraseIndex](user, msg, true);
     }
   }
 
@@ -47,12 +47,8 @@ export default class chatMonitor {
   }
 
   permissionToLevel (permission) {
-    let p = ['', 'sub', 'mod', 'broadcaster', 'global_mod', 'admin', 'staff'];
-    for (let i = 0; i < p.length; i++) {
-      if (p[i] === permission)
-        return i;
-    }
-    return -1;
+    return ['', 'sub', 'mod', 'broadcaster', 'global_mod', 'admin', 'staff']
+    .findIndex(p => p === permission);
   }
 
   // command control
