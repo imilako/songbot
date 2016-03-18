@@ -18,6 +18,6 @@
   "dependencies": {
     "bluebird": "^3.3.4",
     "moment": "^2.12.0",
-    "tmi.js": "0.0.27"
+    "tmi.js": "0.0.28"
   }
 }

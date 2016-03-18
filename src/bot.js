@@ -8,7 +8,7 @@ const options = {
     debug: config.tmiDebug
   },
   connection: {
-    cluster: 'chat',
+    cluster: 'aws',
     reconnect: true
   },
   identity: {
@@ -24,11 +24,15 @@ export default class Bot {
 
     this.client.on('connected', () => {
       this.client.join(this.channel);
-      console.log(`Jonied ${this.channel}`);
+      console.log(`Jonied ${this.opts}`);
     });
 
     this.client.on("whisper", (user, message) => {
       console.log(`${user}: ${message}`);
+    });
+
+    this.client.on("serverchange", (channel) => {
+      throw new Error('Channel is not in this cluster! Exiting...');
     });
 
     this.client.connect();
