@@ -13,13 +13,15 @@ export default class Song {
                     'what\'s the song?',
                     'what is this song',
                     'what song this is',
-                    'name of this song?'  ];
+                    'name of this song?',
+                    'what version is this song?',
+                    'what is the name of the song'  ];
     chatMonitor.registerCommand(this, this.song, '', alias);
     chatMonitor.registerPhrase(this, this.song, '', phrases);
 
     this.bot = bot;
     this.cooldown = 60;
-    this.maxCheckLength = 300000;
+    this.maxCheckLength = 60000*6;
     this.lastUsed = moment().subtract(this.cooldown, 's');
 
     this.hypem = {
@@ -47,7 +49,8 @@ export default class Song {
     this.lastUsed = moment();
     let username = user['display-name'] || user.username;
 
-    Promise.join(request(this.hypem), request(this.lastfm), (songHypem, rawLastFm) => {
+    Promise.join(request(this.hypem), request(this.lastfm), (rawHypem, rawLastFm) => {
+      let songHypem = rawHypem[0]
       let songLastfm = rawLastFm.recenttracks.track[0];
 
       let elapsedHypem = moment().diff(moment.unix(songHypem.ts_played));
