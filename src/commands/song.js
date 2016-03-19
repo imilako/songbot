@@ -39,7 +39,7 @@ export default class Song {
         method: 'user.getRecentTracks',
         format: 'json',
         limit: 2,
-        user: `${creds.lastfUser}`
+        user: `${creds.lastfmUser}`
       }
     }
   }
