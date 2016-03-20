@@ -8,14 +8,17 @@ export default class Song {
     let alias = ['song', 'songname', 'nowplaying', 'currentsong'];
     let phrases = [ 'what song is this',
                     'song name?',
+                    'songname?',
                     'song name pls',
                     'what song is this',
-                    'what\'s the song?',
+                    'what\'s the song',
+                    'whats the song',
                     'what is this song',
                     'what song this is',
                     'name of this song?',
-                    'what version is this song?',
-                    'what is the name of the song'  ];
+                    'what version is this song',
+                    'what is the name of the song',
+                    '^song\\?$'  ];
     chatMonitor.registerCommand(this, this.song, '', alias);
     chatMonitor.registerPhrase(this, this.song, '', phrases);
 
