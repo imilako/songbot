@@ -24,7 +24,7 @@ export default class Bot {
 
     this.client.on('connected', () => {
       this.client.join(this.channel);
-      console.log(`Jonied ${this.opts}`);
+      console.log(`Jonied ${this.channel}`);
     });
 
     this.client.on("whisper", (user, message) => {
