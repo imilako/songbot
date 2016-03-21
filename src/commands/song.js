@@ -7,15 +7,17 @@ export default class Song {
   constructor (bot, chatMonitor) {
     let alias = ['song', 'songname', 'nowplaying', 'currentsong'];
     let phrases = [ 'what song is this',
-                    'song name?',
-                    'songname?',
+                    'song name\\?',
+                    'songname\\?',
+                    'song name anyone\\?',
                     'song name pls',
                     'what song is this',
                     'what\'s the song',
                     'whats the song',
                     'what is this song',
                     'what song this is',
-                    'name of this song?',
+                    'what song is playing\\?',
+                    'name of this song\\?',
                     'what version is this song',
                     'what is the name of the song',
                     '^song\\?$'  ];
@@ -48,10 +50,11 @@ export default class Song {
   }
 
   song (user, args, isPhrase) {
-    if (moment().diff(this.lastUsed, 'seconds') < this.cooldown) return false;
+    if (moment().diff(this.lastUsed, 'seconds') < this.cooldown) return console.log('--> Cooldown active');
     this.lastUsed = moment();
     let username = user['display-name'] || user.username;
 
+    console.log('--> Checking...');
     Promise.join(request(this.hypem), request(this.lastfm), (rawHypem, rawLastFm) => {
       let songHypem = rawHypem[0]
       let songLastfm = rawLastFm.recenttracks.track[0];
@@ -73,6 +76,10 @@ export default class Song {
         song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
       else
         return console.log('--> No song detected in the last 5 min!');
+
+      if (isPhrase) {
+        return console.log(`-> Not sending for phrase: ${args}`);
+      }
 
       /* only whisper when phrase detected
       let sent = isPhrase
