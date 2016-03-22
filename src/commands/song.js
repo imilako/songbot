@@ -12,8 +12,8 @@ export default class Song {
                     'song name anyone\\?',
                     'song name pls',
                     'what song is this',
-                    'what\'s the song',
-                    'whats the song',
+                    'what\'s the song\\?',
+                    'whats the song\\?',
                     'what is this song',
                     'what song this is',
                     'what song is playing\\?',
@@ -51,7 +51,7 @@ export default class Song {
 
   song (user, args, isPhrase) {
     if (moment().diff(this.lastUsed, 'seconds') < this.cooldown) return console.log('--> Cooldown active');
-    this.lastUsed = moment();
+    if (!isPhrase) this.lastUsed = moment();
     let username = user['display-name'] || user.username;
 
     console.log('--> Checking...');
@@ -75,7 +75,7 @@ export default class Song {
       else if (elapsedLastfm < this.maxCheckLength)
         song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
       else
-        return console.log('--> No song detected in the last 5 min!');
+        return console.log('--> No song detected in the last 6 min!');
 
       if (isPhrase) {
         return console.log(`-> Not sending for phrase: ${args}`);
