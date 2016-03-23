@@ -2,13 +2,14 @@ import tmi from 'tmi.js';
 import moment from 'moment';
 import creds from '../creds';
 import config from '../config';
+import logger from './logger';
 
 const options = {
   options: {
     debug: config.tmiDebug
   },
   connection: {
-    cluster: 'aws',
+    cluster: 'chat',
     reconnect: true
   },
   identity: {
@@ -24,11 +25,11 @@ export default class Bot {
 
     this.client.on('connected', () => {
       this.client.join(this.channel);
-      console.log(`Jonied ${this.channel}`);
+      this.logger.log(`Jonied ${this.channel}`);
     });
 
     this.client.on("whisper", (user, message) => {
-      console.log(`${user}: ${message}`);
+      this.logger.log(`${user}: ${message}`);
     });
 
     this.client.on("serverchange", (channel) => {
@@ -37,6 +38,8 @@ export default class Bot {
 
     this.client.connect();
     this.lastSpoke = moment().subtract(config.messageTimeout, 's');
+
+    this.logger = new logger();
   }
 
   say (message) {

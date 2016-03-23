@@ -35,8 +35,7 @@ export default class chatMonitor {
 
   logMsg (user, message) {
     let name = user['display-name'] || user.username;
-    let ts = moment().format('HH:mm');
-    console.log(`${ts} ${name}: ${message}`);
+    this.bot.logger.log(`${name}: ${message}`);
   }
 
   getUserPermission (channel, user) {
@@ -54,6 +53,14 @@ export default class chatMonitor {
   }
 
   // command control
+  registerCommand (context, command, permission, alias = [command.name]) {
+    let newCommand = command.bind(context);
+    newCommand.permission = this.permissionToLevel(permission || '');
+    newCommand.alias = alias;
+    this.commands.push(newCommand);
+    console.log(`Registered command ${newCommand.alias[0]}`);
+  }
+
   getCommandIndex (name) {
     return this.commands
       .map((command, i) => {
@@ -61,14 +68,6 @@ export default class chatMonitor {
         return -1;
       })
       .filter(e => e !== -1);
-  }
-
-  registerCommand (context, command, permission, alias = [command.name]) {
-    let newCommand = command.bind(context);
-    newCommand.permission = this.permissionToLevel(permission || '');
-    newCommand.alias = alias;
-    this.commands.push(newCommand);
-    console.log(`Registered command ${newCommand.alias[0]}`);
   }
 
   // phrase control

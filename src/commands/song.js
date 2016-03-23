@@ -50,11 +50,11 @@ export default class Song {
   }
 
   song (user, args, isPhrase) {
-    if (moment().diff(this.lastUsed, 'seconds') < this.cooldown) return console.log('--> Cooldown active');
-    if (!isPhrase) this.lastUsed = moment();
+    if (moment().diff(this.lastUsed, 'seconds') < this.cooldown) return this.bot.logger.log('--> Cooldown active');
+    if (!isPhrase) this.lastUsed = moment(); // REMOVE CHECK AFTER TESTING !!!!!!!!!!!!
     let username = user['display-name'] || user.username;
 
-    console.log('--> Checking...');
+    this.bot.logger.log('--> Checking...');
     Promise.join(request(this.hypem), request(this.lastfm), (rawHypem, rawLastFm) => {
       let songHypem = rawHypem[0]
       let songLastfm = rawLastFm.recenttracks.track[0];
@@ -75,10 +75,10 @@ export default class Song {
       else if (elapsedLastfm < this.maxCheckLength)
         song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
       else
-        return console.log('--> No song detected in the last 6 min!');
+        return this.bot.logger.log('--> No song detected in the last 6 min!');
 
       if (isPhrase) {
-        return console.log(`-> Not sending for phrase: ${args}`);
+        return this.bot.logger.log(`-> Not sending for phrase: ${args}`); // REMOVE CHECK AFTER TESTING !!!!!!!!!!!!
       }
 
       /* only whisper when phrase detected
@@ -87,7 +87,7 @@ export default class Song {
         : this.bot.say(song); */
       let sent = this.bot.say(song);
       if (!sent) this.bot.whisper(username, song);
-      console.log(`--> ${song}`);
+      this.bot.logger.log(`--> ${song}`);
     })
   }
 }
