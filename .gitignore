@@ -1,6 +1,8 @@
 node_modules
 lib
 logs/*
+!logs/README.md
+
 config.json
 creds.json
 creds1.json
