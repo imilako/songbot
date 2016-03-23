@@ -64,7 +64,7 @@ export default class chatMonitor {
   getCommandIndex (name) {
     return this.commands
       .map((command, i) => {
-        if (command.alias.includes(name)) return i;
+        if (command.alias.findIndex(a => a === name) >= 0) return i;
         return -1;
       })
       .filter(e => e !== -1);
