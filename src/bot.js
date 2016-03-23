@@ -9,7 +9,7 @@ const options = {
     debug: config.tmiDebug
   },
   connection: {
-    cluster: 'chat',
+    cluster: 'aws',
     reconnect: true
   },
   identity: {
