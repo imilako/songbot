@@ -1,13 +1,17 @@
 import request from 'request-promise';
 import moment from 'moment';
 import Promise from 'bluebird';
+import Module from '../module.js';
 import creds from '../../creds';
 
-export default class Song {
+export default class Song extends Module {
   constructor (bot, chatMonitor) {
+    super(bot, chatMonitor);
+
     let alias = ['song', 'songname', 'nowplaying', 'currentsong'];
     let phrases = [ 'what song is this',
                     'song name\\?',
+                    'song title\\?',
                     'songname\\?',
                     'song name anyone\\?',
                     'song name pls',
@@ -21,13 +25,15 @@ export default class Song {
                     'what version is this song',
                     'what is the name of the song',
                     '^song\\?$'  ];
-    chatMonitor.registerCommand(this, this.song, '', alias);
-    chatMonitor.registerPhrase(this, this.song, '', phrases);
 
-    this.bot = bot;
-    this.cooldown = 60;
+    this.registerCommand({
+      command: this.song,
+      alias: alias,
+      phrases: phrases,
+      cooldown: 60
+    });
+
     this.maxCheckLength = 60000*6;
-    this.lastUsed = moment().subtract(this.cooldown, 's');
 
     this.hypem = {
       uri: `https://api.hypem.com/v2/users/${creds.hypemUser}/history?key=swagger`,
@@ -50,13 +56,10 @@ export default class Song {
   }
 
   song (user, args, isPhrase) {
-    if (moment().diff(this.lastUsed, 'seconds') < this.cooldown) return this.bot.logger.log('--> Cooldown active');
-    if (!isPhrase) this.lastUsed = moment(); // REMOVE CHECK AFTER TESTING !!!!!!!!!!!!
     let username = user['display-name'] || user.username;
-
     this.bot.logger.log('--> Checking...');
     Promise.join(request(this.hypem), request(this.lastfm), (rawHypem, rawLastFm) => {
-      let songHypem = rawHypem[0]
+      let songHypem = rawHypem[0];
       let songLastfm = rawLastFm.recenttracks.track[0];
 
       let elapsedHypem = moment().diff(moment.unix(songHypem.ts_played));
@@ -68,17 +71,15 @@ export default class Song {
         : moment().diff(moment.unix(songLastfm.date.uts));
 
       let song = '';
-      if (elapsedHypem < this.maxCheckLength)
+      if (elapsedHypem < this.maxCheckLength) {
         song = `${songHypem.artist} - ${songHypem.title}`;
-      else if (nowScrobbling)
+      } else if (nowScrobbling) {
         song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
-      else if (elapsedLastfm < this.maxCheckLength)
+      } else if (elapsedLastfm < this.maxCheckLength) {
         song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
-      else
-        return this.bot.logger.log('--> No song detected in the last 6 min!');
-
-      if (isPhrase) {
-        return this.bot.logger.log(`-> Not sending for phrase: ${args}`); // REMOVE CHECK AFTER TESTING !!!!!!!!!!!!
+      } else {
+        let humanReadable = moment.duration(this.maxCheckLength, 'milliseconds').humanize();
+        return this.bot.logger.log(`--> No song detected in the last ${humanReadable}!`);
       }
 
       /* only whisper when phrase detected
@@ -89,5 +90,6 @@ export default class Song {
       if (!sent) this.bot.whisper(username, song);
       this.bot.logger.log(`--> ${song}`);
     })
+    .catch(e => this.bot.logger.log(`--> Error fetching song info: ${e}`));
   }
 }

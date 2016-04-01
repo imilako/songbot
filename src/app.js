@@ -1,8 +1,6 @@
 import Bot from './bot';
 import chatMonitor from './chatMonitor';
-
-import Song from './commands/song';
-//import Echo from './commands/echo';
+import fs from 'fs';
 
 export default class App {
   constructor () {
@@ -10,8 +8,13 @@ export default class App {
     const bot = new Bot();
     const chat = new chatMonitor(bot)
 
-    const song = new Song(bot, chat);
-    //const echo = new Echo(bot, chat);
+    let modules = [];
+    fs.readdir('./src/modules', (err, files) => {
+      files.forEach(file => {
+        let module = require(`./modules/${file}`).default;
+        modules.push(new module(bot, chat))
+      });
+    })
   }
 }
 

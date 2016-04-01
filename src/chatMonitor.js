@@ -1,8 +1,11 @@
 import moment from 'moment';
+import {permissionToLevel} from './utils';
 
 export default class chatMonitor {
   constructor (bot) {
-    bot.client.on('chat', this.onChat.bind(this));
+    let onChat = this.onChat.bind(this);
+    bot.client.on('chat', onChat);
+    bot.client.on('action', onChat);
     this.commands = [];
     this.phrases = [];
     this.bot = bot;
@@ -12,23 +15,19 @@ export default class chatMonitor {
     this.logMsg(user, message);
     let msg = message.trim().toLowerCase();
     // check for command
-    let firstWord = msg.split(' ', 1)[0];
-    if (firstWord.charAt(0) === '!') {
-      let userPermission = this.getUserPermission(channel, user);
-      let command = firstWord.substr(1);
-      let commandIndex = this.getCommandIndex (command);
+    if (msg.charAt(0) === '!') {
+      let command = msg.split(' ', 1)[0].substr(1);
+      let commandIndex = this.getCommandIndex(command);
       commandIndex.forEach(i => {
-        if (userPermission >= this.commands[i].permission)
-          this.commands[i](user, msg.substr(firstWord.length+1), false);
+        this.executeCommand(i, channel, user, msg.substr(command.length+2), false);
       })
     }
     // check for phrase
     let phraseIndex = this.getPhraseIndex(message);
     if (phraseIndex.length) {
-      let userPermission = this.getUserPermission(channel, user);
       phraseIndex.forEach(i => {
-        if (userPermission >= this.phrases[i].permission)
-          this.phrases[i](user, message, true);
+        let commandIndex = this.phrases[i].index;
+        this.executeCommand(commandIndex, channel, user, message, true);
       })
     }
   }
@@ -40,25 +39,22 @@ export default class chatMonitor {
 
   getUserPermission (channel, user) {
     let permission = '';
-    if (user.subscriber) permission = 'sub';
-    if (user.mod) permission = 'mod';
+    if (user.subscriber)
+      permission = 'sub';
+    if (user.mod)
+      permission = 'mod';
     if (user.username === channel.replace(/^#/, ''))
       permission = 'broadcaster';
-    return this.permissionToLevel(permission);
-  }
-
-  permissionToLevel (permission) {
-    return ['', 'sub', 'mod', 'broadcaster', 'global_mod', 'admin', 'staff']
-    .findIndex(p => p === permission);
+    return permissionToLevel(permission);
   }
 
   // command control
-  registerCommand (context, command, permission, alias = [command.name]) {
-    let newCommand = command.bind(context);
-    newCommand.permission = this.permissionToLevel(permission || '');
-    newCommand.alias = alias;
-    this.commands.push(newCommand);
-    console.log(`Registered command ${newCommand.alias[0]}`);
+  registerCommand (command, phrases) {
+    let index = this.commands.push(command) - 1;
+    console.log(`Registered command ${command.alias}`);
+    if (phrases) {
+      this.registerPhrase(index, phrases);
+    }
   }
 
   getCommandIndex (name) {
@@ -71,11 +67,12 @@ export default class chatMonitor {
   }
 
   // phrase control
-  registerPhrase (context, command, permission, alias) {
-    let newPhrase = command.bind(context);
-    let regex = alias.reduce((prev, curr) => `${prev}|${curr}`);
-    newPhrase.permission = this.permissionToLevel(permission || '');
-    newPhrase.regex = new RegExp(regex, 'i');
+  registerPhrase (index, phrases) {
+    let regex = phrases.reduce((prev, curr) => `${prev}|${curr}`);
+    let newPhrase = {
+      regex: new RegExp(regex, 'i'),
+      index: index
+    }
     this.phrases.push(newPhrase);
     console.log(`Registered phrase/s ${regex}`);
   }
@@ -87,5 +84,21 @@ export default class chatMonitor {
         return -1;
       })
       .filter(e => e !== -1);
+  }
+
+  executeCommand (index, channel, user, args, isPhrase) {
+    let command = this.commands[index];
+    let userPermission = this.getUserPermission(channel, user);
+    let timePassed = moment().diff(command.lastUsed, 'seconds');
+
+    if (timePassed < command.cooldown) {
+      return this.bot.logger.log(`--> Cooldown is active for ${command.name}`);
+    }
+    if (userPermission < this.commands[index].permission) {
+      return this.bot.logger.log(`--> ${command.name} requires a higher permission`);
+    }
+
+    command.lastUsed = moment();
+    command(user, args, isPhrase);
   }
 }
