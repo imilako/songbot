@@ -17,6 +17,7 @@ export default class Song extends Module {
                     'song name pls',
                     'what song is this',
                     'what\'s the song\\?',
+                    'what\'s the song called\\?',
                     'whats the song\\?',
                     'what is this song',
                     'what song this is',
@@ -30,7 +31,7 @@ export default class Song extends Module {
       command: this.song,
       alias: alias,
       phrases: phrases,
-      cooldown: 60
+      cooldown: 45
     });
 
     this.maxCheckLength = 60000*6;
@@ -55,7 +56,7 @@ export default class Song extends Module {
     }
   }
 
-  song (user, args, isPhrase) {
+  song (user, args, self, isPhrase) {
     let username = user['display-name'] || user.username;
     this.bot.logger.log('--> Checking...');
     Promise.join(request(this.hypem), request(this.lastfm), (rawHypem, rawLastFm) => {
@@ -78,8 +79,14 @@ export default class Song extends Module {
       } else if (elapsedLastfm < this.maxCheckLength) {
         song = `${songLastfm.artist['#text']} - ${songLastfm.name}`;
       } else {
+        self.resetCooldown();
         let humanReadable = moment.duration(this.maxCheckLength, 'milliseconds').humanize();
         return this.bot.logger.log(`--> No song detected in the last ${humanReadable}!`);
+      }
+
+      if (isPhrase) { // TODO: remove after testing
+        self.resetCooldown();
+        return this.bot.logger.log(`--> Not sending '${song}' for phrase: ${args}`)
       }
 
       /* only whisper when phrase detected

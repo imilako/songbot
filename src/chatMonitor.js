@@ -99,6 +99,6 @@ export default class chatMonitor {
     }
 
     command.lastUsed = moment();
-    command(user, args, isPhrase);
+    command(user, args, command, isPhrase);
   }
 }

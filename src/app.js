@@ -6,13 +6,13 @@ export default class App {
   constructor () {
     console.log(`Starting songbot`)
     const bot = new Bot();
-    const chat = new chatMonitor(bot)
+    const chat = new chatMonitor(bot);
 
     let modules = [];
     fs.readdir('./src/modules', (err, files) => {
       files.forEach(file => {
         let module = require(`./modules/${file}`).default;
-        modules.push(new module(bot, chat))
+        modules.push(new module(bot, chat));
       });
     })
   }

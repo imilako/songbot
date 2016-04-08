@@ -8,6 +8,10 @@ export default class Module {
     this.defaultCooldown = 60;
   }
 
+  resetCooldown () {
+    this.lastUsed.subtract(this.cooldown, 's');
+  }
+
   createCommand (options) {
     let {permission, alias, cooldown} = options;
     let command = options.command.bind(this);
@@ -15,9 +19,10 @@ export default class Module {
 
     command.permission = permission ? level : 0;
     command.alias = alias ? alias : [command.name];
-    command.lastUsed = moment().subtract(command.cooldown, 's');
     command.cooldown = cooldown ? cooldown : this.defaultCooldown;
-    if (cooldown === 0) command.cooldown = 0;
+    command.cooldown = cooldown === 0 ? 0 : command.cooldown;
+    command.lastUsed = moment().subtract(command.cooldown, 's');
+    command.resetCooldown = this.resetCooldown;
 
     return command;
   }
