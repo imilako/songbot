@@ -1,23 +1,16 @@
-import Bot from './bot';
-import chatMonitor from './chatMonitor';
-import fs from 'fs';
+import Bot from './bot'
+import ChatMonitor from './chatMonitor'
+import fs from 'fs'
 
-export default class App {
-  constructor () {
-    console.log(`Starting songbot`)
-    const bot = new Bot();
-    const chat = new chatMonitor(bot);
+console.log('Starting songbot')
+const bot = new Bot()
+const chat = new ChatMonitor(bot)
 
-    let modules = [];
-    fs.readdir('./src/modules', (err, files) => {
-      files.forEach(file => {
-        let module = require(`./modules/${file}`).default;
-        modules.push(new module(bot, chat));
-      });
-    })
-  }
-}
-
-(function () {
-  new App();
-})();
+let modules = []
+fs.readdir('./src/modules', (err, files) => {
+  if (err) console.log(err)
+  files.forEach(file => {
+    let Module = require(`./modules/${file}`).default
+    modules.push(new Module(bot, chat))
+  })
+})
