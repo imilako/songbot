@@ -9,28 +9,10 @@ export default class Song extends Module {
     super(bot, chatMonitor)
 
     let alias = ['song', 'songname', 'nowplaying', 'currentsong']
-    let phrases = [ 'what song is this',
-                    'song name\\?',
-                    'song title\\?',
-                    'songname\\?',
-                    'song name anyone\\?',
-                    'song name pls',
-                    'what song is this',
-                    'what\'s the song\\?',
-                    'what\'s the song called\\?',
-                    'whats the song\\?',
-                    'what is this song',
-                    'what song this is',
-                    'what song is playing\\?',
-                    'name of this song\\?',
-                    'what version is this song',
-                    'what is the name of the song',
-                    '^song\\?$' ]
 
     this.registerCommand({
       command: this.song,
       alias: alias,
-      phrases: phrases,
       cooldown: 45
     })
 
@@ -80,11 +62,6 @@ export default class Song extends Module {
         self.resetCooldown()
         let humanReadable = moment.duration(this.maxCheckLength, 'milliseconds').humanize()
         return this.bot.logger.log(`--> No song detected in the last ${humanReadable}!`)
-      }
-
-      if (isPhrase) { // TODO: remove after testing
-        self.resetCooldown()
-        return this.bot.logger.log(`--> Not sending '${song}' for phrase: ${args}`)
       }
 
       /* only whisper when phrase detected
